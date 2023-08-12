@@ -10,8 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class BeanFactory {
-
-
+    
     private final Set<Class<?>> preInstantiatedClass;
 
     private Map<Class<?>, Object> beans = new HashMap<>();
