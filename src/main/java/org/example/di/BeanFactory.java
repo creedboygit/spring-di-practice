@@ -1,17 +1,13 @@
 package org.example.di;
 
-import static com.sun.beans.finder.ConstructorFinder.findConstructor;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import org.example.annotation.Inject;
-import org.example.controller.UserController;
-import org.reflections.ReflectionUtils;
 
 public class BeanFactory {
 
@@ -54,12 +50,23 @@ public class BeanFactory {
     }
 
     private Constructor<?> findConstructor(Class<?> clazz) {
-        Set<Constructor> injectedConstructors = ReflectionUtils.getAllConstructors(clazz, ReflectionUtils.withAnnotation(Inject.class));
-        if (injectedConstructors.isEmpty()) {
-            return null;
+        Constructor<?> constructor = BeanFactoryUtils.getInjectedConstructor(clazz);
+
+        if (Objects.nonNull(constructor)) {
+            return constructor;
         }
 
-        return injectedConstructors.iterator().next();
+        return clazz.getConstructors()[0];
+    }
+
+    private Object getParameterByClass(Class<?> typeClass) {
+        Object instanceBean = getBean(typeClass);
+
+        if (Objects.nonNull(instanceBean)) {
+            return instanceBean;
+        }
+
+        return createInstance(typeClass);
     }
 
     public <T> T getBean(Class<T> requiredType) {
